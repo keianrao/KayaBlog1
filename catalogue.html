@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+
+    <body>
+        <div id="no-js">
+
+            <p>
+                Hello!
+                This web application makes heavy use of HTML and CSS, but it is still a JavaScript web application..
+                So it won't run without JavaScript turned on.
+            </p>
+            <p>
+                It's a demo of a blogging software.
+                Functionality wise, it's the usual - it has lists of articles you can browse, and you can submit articles.
+                But I'm experimenting with the layout of where I put all the elements of the page, to try to avoid friction in the browsing experience,
+                with actual browsing of multiple articles in mind (as opposed to stopping by for one page).
+                Technology wise, the articles are not files on the web server that you can navigate to and be served with.
+                They're fetched from a database, gated by a backend server that the JavaScript code running in this page will communicate over HTTP with.
+                Hence why this is a JavaScript web application.
+            </p>
+            <p>
+                When JavaScript is turned off, or the JavaScript engine isn't up and running yet, or the database is yet to be connected to,
+                there should be no content other than this notice. If there are, pardon me, I wrote something wrong, and, please ignore them.
+            </p>
+
+        </div>
+        <div id="yes-js" hidden="true">
+
+            <h1>Articles</h1>
+            <li id="articles-list">
+
+            </li>
+
+            <div id="separator" alt="Section separator"></div>
+
+            <a href="submit.html">Compose and submit new post</a>
+
+        </div>
+    </body>
+
+    <script src="database-client.js"></script>
+    <script>
+
+    </script>
+
+</html>
