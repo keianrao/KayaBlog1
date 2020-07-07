@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+
+    <meta charset="utf-8">
+
+    <body>
+        <textarea id="contents" cols=80 rows=24></textarea>
+        <br><br>
+        <input id="username" type="text" placeholder="Username"></input>
+        <input id="password" type="password" placeholder="Password"></input>
+        <br><br>
+        <button id="submit" disabled=true>Submit</button>
+        <span id="statusbar"></span>
+    </body>
+
+    <script src="database-client.js"></script>
+    <script>
+        var username = document.getElementById("username");
+        var password = document.getElementById("password");
+        var submit = document.getElementById("submit");
+        var statusbar = document.getElementById("statusbar");
+
+        connectToDatabase()
+            .then(function (result) {
+                submit.disabled = false;
+            })
+            .catch(function (failureReason) {
+                statusbar.innerHTML = failureReason;
+            });
+    </script>
+
+</html>

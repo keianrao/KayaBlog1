@@ -1,6 +1,8 @@
 <!doctype html>
 <html>
 
+    <meta charset="utf-8">
+
     <body>
         <div id="no-js">
 
@@ -24,14 +26,18 @@
             </p>
 
         </div>
-        <div id="yes-js" hidden="true">
+        <div id="yes-js" hidden>
 
             <h1>Articles</h1>
-            <li id="articles-list">
+            <ul id="articles-list">
+                <!-- sic. An ordered list might make more sense but, we're going to do our own numbering scheme for articles, I think.. -->
+            </ul>
 
-            </li>
-
-            <div id="separator" alt="Section separator"></div>
+            <div id="separator" alt="Section separator">
+                <br><br>
+                //  \\  //  \\  //  \\  //  \\  //  \\  //  \\  //  \\  //  \\  //  \\  //  \\  //  \\  //  \\  //  \\  //  \\
+                <br><br>
+            </div>
 
             <a href="submit.html">Compose and submit new post</a>
 
@@ -40,6 +46,28 @@
 
     <script src="database-client.js"></script>
     <script>
+        var noJsDiv = document.getElementById("no-js"), yesJsDiv = document.getElementById("yes-js");
+        var articlesList = document.getElementById("articles-list");
+
+        noJsDiv.hidden = true;
+        yesJsDiv.hidden = false;
+        // The 'display' attribute in CSS can override these, so maybe we should use both? Ignore this comment if we're not using CSS.
+
+        function renderArticle(article)
+        // Renders the given articleObject in the articles list.
+        {
+            var domArticleListItem = document.createElement("li");
+            var domArticleAnchor = document.createElement("a");
+            var domArticleDate = document.createElement("span");
+
+            domArticleDate.innerHTML = "20 Feb 2018";
+            domArticleAnchor.insertBefore(domArticleDate, null);
+            domArticleAnchor.innerHTML += " - This is a test element.";
+            domArticleListItem.insertBefore(domArticleAnchor, null);
+            articlesList.insertBefore(domArticleListItem, null);
+        }
+
+        renderArticle();
 
     </script>
 
