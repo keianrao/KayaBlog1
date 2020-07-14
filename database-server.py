@@ -3,6 +3,14 @@
 from flask import Flask, request, jsonify
 app = Flask(__name__)
 
+# Read credentials
+import os.path
+if not os.path.isfile('database-credentials.cfg'):
+    raise FileNotFoundError("Need file 'database-credentials.cfg'!");
+with open('database-credentials.cfg') as credentialFile:
+    username = credentialFile.readline();
+    password = credentialFile.readline();
+
 ##  %%  ##  %%  ##  %%  ##  %%  ##
 
 @app.route('/', methods = ["GET"])
