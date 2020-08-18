@@ -3,15 +3,12 @@
 from flask import Flask, request, jsonify
 app = Flask(__name__)
 
-# Read credentials
-import os.path
-if not os.path.isfile('database-credentials.cfg'):
-    raise FileNotFoundError("Need file 'database-credentials.cfg'!");
-with open('database-credentials.cfg') as credentialFile:
-    username = credentialFile.readline();
-    password = credentialFile.readline();
+_username = None
+_password = None
+
 
 ##  %%  ##  %%  ##  %%  ##  %%  ##
+
 
 @app.route('/', methods = ["GET"])
 def index():
@@ -35,7 +32,23 @@ def submit():
     });
     # Please figure out how to give a HTTP error.
 
+
 ##  %%  ##  %%  ##  %%  ##  %%  ##
 
+
+def _read_credentials_from_config():
+    import os.path
+    global _username, _password
+    if not os.path.isfile('database-credentials.cfg'):
+        raise FileNotFoundError("Need file 'database-credentials.cfg'!");
+    with open('database-credentials.cfg') as credentialFile:
+        _username = credentialFile.readline();
+        _password = credentialFile.readline();
+
+def _initiate_database_connection():
+    pass
+
 if __name__ == "__main__":
-    app.run()
+    _read_credentials_from_config();
+    _initiate_database_connection();
+    app.run();
