@@ -2,9 +2,6 @@
 
 import psycopg2
 
-_DATABASE_NAME = "KayaBlog1-dev"
-
-
 # Reference for errors:
 # https://www.psycopg.org/docs/errors.html
 # The most public documentation online are very sparse, be careful.
@@ -16,18 +13,21 @@ _DATABASE_NAME = "KayaBlog1-dev"
 ##  %%  ##  %%  ##  %%  ##  %%  ##
 
 
-def initialise_database_connection(host, port, username, password):
+def initialise_database_connection(host, port, username, password, dbname):
     global _connection
     try:
         _connection = psycopg2.connect(
-            dbname = _DATABASE_NAME,
+            dbname = dbname,
             user = username,
             password = password,
             host = host,
             port = port
         );
     except psycopg2.OperationalError as op_err:
+        print(op_err);
         _connection = None
+        return
+        # We need to throw something..
 
     # We have to get a Cursor now.
     # Who should manage the Connection object, actually? Cursor object?
@@ -45,4 +45,11 @@ def initialise_database_connection_from_config_file(filepath):
         port = credentialFile.readline().strip();
         username = credentialFile.readline().strip();
         password = credentialFile.readline().strip();
-        initialise_database_connection(host, port, username, password);
+        dbname = credentialFile.readline().strip();
+        initialise_database_connection(host, port, username, password, dbname);
+
+
+def disconnect_database_connection():
+    if _connection == None:
+        return
+    _connection.close()

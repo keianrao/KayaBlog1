@@ -38,3 +38,4 @@ if __name__ == "__main__":
     db.initialise_database_connection_from_config_file \
         ('database_credentials.cfg');
     app.run();
+    db.disconnect_database_connection();
