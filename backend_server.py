@@ -3,9 +3,6 @@
 from flask import Flask, request, jsonify
 app = Flask(__name__)
 
-_username = None
-_password = None
-
 
 ##  %%  ##  %%  ##  %%  ##  %%  ##
 
@@ -36,19 +33,8 @@ def submit():
 ##  %%  ##  %%  ##  %%  ##  %%  ##
 
 
-def _read_credentials_from_config():
-    import os.path
-    global _username, _password
-    if not os.path.isfile('database-credentials.cfg'):
-        raise FileNotFoundError("Need file 'database-credentials.cfg'!");
-    with open('database-credentials.cfg') as credentialFile:
-        _username = credentialFile.readline();
-        _password = credentialFile.readline();
-
-def _initiate_database_connection():
-    pass
-
 if __name__ == "__main__":
-    _read_credentials_from_config();
-    _initiate_database_connection();
+    import backend_database_postgresql as db
+    db.initialise_database_connection_from_config_file \
+        ('database_credentials.cfg');
     app.run();
