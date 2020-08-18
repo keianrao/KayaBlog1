@@ -1,26 +1,39 @@
 #!/usr/bin/env python3
 
-DATABASE_NAME = "KayaBlog1-dev"
+import psycopg2
+
+_DATABASE_NAME = "KayaBlog1-dev"
+
+
+# Reference for errors:
+# https://www.psycopg.org/docs/errors.html
+# The most public documentation online are very sparse, be careful.
+# For any PostgreSQL error code psycopg2 encounters, it throws
+# some sort of DB_API exception. It's rather scattered so, doing
+# catch-alls like 'except Exception' isn't the worst strategy..
+
+
+##  %%  ##  %%  ##  %%  ##  %%  ##
+
 
 def initialise_database_connection(host, port, username, password):
-    connection = connect(
-        database = DATABASE_NAME,
-        user = username,
-        password = password,
-        host = "{1}:{2}".format(host, port)
-    );
-    # Not sure how to proceed from here.
-    # I'd like to check if the connection succeeded -
-    # The docs do not hint that an exception will be raised..
+    global _connection
+    try:
+        _connection = psycopg2.connect(
+            dbname = _DATABASE_NAME,
+            user = username,
+            password = password,
+            host = host,
+            port = port
+        );
+    except psycopg2.OperationalError as op_err:
+        _connection = None
 
-    # If it succeeded, we then have to get a Cursor, as usual.
-    # But I'm not sure how. And, who should manage the Connection
-    # object? This module, as a sort of state machine pairing with
-    # backend-server.py? Or should we return the Connection object
-    # for the latter to keep? But we don't really want database
-    # logic in that module.
-
-    # Also, we need to import postgresql's module.
+    # We have to get a Cursor now.
+    # Who should manage the Connection object, actually? Cursor object?
+    # Should we maintain the former but return instances of the latter?
+    # Or should we maintain all of them, and do all database operations
+    # on behalf of the other backend modules?
 
 
 def initialise_database_connection_from_config_file(filepath):
