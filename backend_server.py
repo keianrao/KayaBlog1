@@ -4,38 +4,49 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 
-##  %%  ##  %%  ##  %%  ##  %%  ##
+##	%%	##	%%	##	%%	##	%%	##
 
 
 @app.route('/', methods = ["GET"])
 def index():
-    return jsonify({
-        "argumentType": "dictionary"
-    });
+	return jsonify({
+		"argumentType": "dictionary"
+	});
 
 @app.route('/', methods = ["PUT"])
 def submit():
-    print(request.form)
-    # request.form is a dictionary that contains POST data - key-value pairs.
-    # It's more appropriate for a route with method 'POST' rather than 'PUT',
-    # but we're not going to use POST data in our app actually.
-    # We'll continue using PUT, and accept JSON data through request.json.
-    # ...Also, by sheer force of miracle, we can access a request object
-    # despite having no arguments in our function. Is this request object
-    # we're using specific to this entire Python process, and a new instance of
-    # Python is run everytime a request comes in?
-    return jsonify({
-        "error": "Operation not supported yet!"
-    });
-    # Please figure out how to give a HTTP error.
+	print(request.form)
+	# Flask docs just says that this is a dict with 'parsed form data'
+	# from POST or PUT requests. But where is it coming from, and
+	# what counts as "form data" in this case?
+	# Meanwhile, request.args is what I thought this was, the parsed
+	# a parsed query string if available.
+	# Right now, our plan is to have requests give JSON data inside
+	# their body. We should use request.get_json for that case.
+	
+	# About 'request': https://tedboy.github.io/flask
+	# /interface_api.incoming_request_data.html#flask.request
+	# It is a proxy, that correctly gets the data for
+	# the particular thread accessing it.
+	return jsonify({
+		"error": "Operation not supported yet!"
+	});
+	# Please figure out how to give a HTTP error.
 
 
-##  %%  ##  %%  ##  %%  ##  %%  ##
+##	%%	##	%%	##	%%	##	%%	##
 
 
 if __name__ == "__main__":
-    import backend_database_postgresql as db
-    db.initialise_database_connection_from_config_file \
-        ('database_credentials.cfg');
-    app.run();
-    db.disconnect_database_connection();
+	import backend_database_postgresql as db
+	if not db.initialise_database_connection_from_default_config_file():
+		print("{}{}{}{}".format(
+			"We tried to read database connection settings from ",
+			"the config file $HOME/.config/KayaBlog/connection, ",
+			"but that didn't go well. Could you check the file? ",
+			"If it doesn't exist, please fill it out. Thanks!"
+		));
+		exit(1);
+		
+	app.run();
+	db.disconnect_database_connection();
