@@ -17,7 +17,11 @@
 # if we connect twice - later on our code should heave measures 
 # for that.
 
-import db
+import backend_database_postgresql as db
+
+
+
+##  %%  ##  %%  ##  %%  ##  %%  ##  %%  ##  %%
 
 db.initialise_database_connection_from_default_config_file();
 

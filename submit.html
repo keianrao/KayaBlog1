@@ -4,21 +4,32 @@
     <meta charset="utf-8">
 
     <body>
+		<a href="/catalogue">Cancel and return to Catalogue</a>
+		<br><br>
+		<input id="title" type="text" placeholder="Title"></input>
+		<br>
         <textarea id="contents" cols=80 rows=24></textarea>
-        <br><br>
+        <br>
+		<input id="tags" type="text" placeholder="Tags"></input>
+		<br><br>
         <input id="username" type="text" placeholder="Username"></input>
         <input id="password" type="password" placeholder="Password"></input>
-        <br><br>
         <button id="submit" disabled=true>Submit</button>
         <span id="statusbar"></span>
     </body>
 
     <script src="database-client.js"></script>
     <script>
+		var title = document.getElementById("title");
+		var tags = document.getElementById("tags");
         var username = document.getElementById("username");
         var password = document.getElementById("password");
         var submit = document.getElementById("submit");
         var statusbar = document.getElementById("statusbar");
+		/*
+		* Why are we grabbing individual fields like this?
+		* If it's all one form, shouldn't we make a <form>?
+		*/
 
         connectToDatabase()
             .then(function (result) {

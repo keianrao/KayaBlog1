@@ -3,6 +3,7 @@
 import psycopg2
 import os
 import os.path
+from backend_models import Blogpost
 
 # Reference for errors:
 # https://www.psycopg.org/docs/errors.html
@@ -21,17 +22,24 @@ _connection = None;
 
 ##	%%	##	%%	##	%%	##	%%	##
 
-def add_blog_post(blog_post_model):
+def add_blog_post(blogpost):
+	if type(blogpost) != Blogpost:
+		# Complain.
+		# It's okay for us to reject, we have no idea
+		# what to do with other kinds of objects anyways.
+		# Theoretically we could be open and access the object
+		# given to us as a dictionary, so we just ask that we can do
+		# 'object.author', 'object.body', etc.
+		# But for now let's just be typed. I don't know.
+		return;
+
 	if _connection == None:
 		# Complain
 		return;
 		
-	# We have to have some sort of model for the blog post,
-	# I'm thinking of it now. But looking at the way I designed
-	# submit.html, it may be that I want to go with markup for
-	# article content - with the title and tags embedded inside
-	# the markup - rather than have genuinely different fields
-	# for everything. Let's see.
+	# Okay, get a database cursor.
+	# Use psycopg techniques to create an insert statement.
+	# Execute then return;
 
 
 def initialise_database_connection(host, port, username, password, dbname):
