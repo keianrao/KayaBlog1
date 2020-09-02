@@ -29,7 +29,7 @@ def add_blog_post(blogpost):
 		# what to do with other kinds of objects anyways.
 		# Theoretically we could be open and access the object
 		# given to us as a dictionary, so we just ask that we can do
-		# 'object.author', 'object.body', etc.
+		# 'object["author"]', 'object["body"]', etc.
 		# But for now let's just be typed. I don't know.
 		return;
 
