@@ -18,6 +18,7 @@
 # for that.
 
 import backend_database_postgresql as db
+from psycopg2 import sql
 
 
 
@@ -26,11 +27,62 @@ import backend_database_postgresql as db
 db.initialise_database_connection_from_default_config_file();
 
 def testSelect():
-	pass
+	assert db._connection != None;
+	with db._connection.cursor() as cursor:
+		# db's interface doesn't support arbitrary access.
+		# But we want to go to town against test tables,
+		# so we'll bypass the interface and use the connection here.
+		# Perhaps we should have a get_connection() in the interface?
+		# Or is that a big security risk..		
+		query = sql.SQL(
+			"""
+			SELECT *
+			FROM {};
+			"""
+		).format(
+			sql.Identifier("ingredients")
+		);
+		
+		cursor.execute(query);		
+		for ingredient in cursor.fetchall():
+			print(ingredient);
+			
 
 def testInsert():
-	pass
+	assert db._connection != None;
+	with db._connection.cursor() as cursor:
+		query = sql.SQL(
+			"""
+			DELETE
+			FROM {}
+			WHERE name = %s;
+			"""
+		).format(
+			sql.Identifier("ingredients")
+		);
+		cursor.execute(query, ("Ketam",));
+		
+		columns = ('id', 'name')
+		query = sql.SQL(
+			"""
+			INSERT
+			INTO {}
+			({})
+			VALUES ({});
+			"""
+		).format(
+			sql.Identifier("ingredients"),
+			sql.SQL(', ').join(map(sql.Identifier, columns)),
+			sql.SQL(', ').join(sql.Placeholder() * len(columns))
+		);
+		cursor.execute(query, ("3", "Ketam"));
+
 
 # If our blog later supports deletion through the application,
 # we should test for that. Our test tables should also have
 # a date column somewhere, so we can sort the results by it.
+
+testInsert();
+testSelect();
+
+db.disconnect_database_connection();
