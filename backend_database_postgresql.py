@@ -21,6 +21,19 @@ _connection = None;
 
 ##	%%	##	%%	##	%%	##	%%	##
 
+def add_blog_post(blog_post_model):
+	if _connection == None:
+		# Complain
+		return;
+		
+	# We have to have some sort of model for the blog post,
+	# I'm thinking of it now. But looking at the way I designed
+	# submit.html, it may be that I want to go with markup for
+	# article content - with the title and tags embedded inside
+	# the markup - rather than have genuinely different fields
+	# for everything. Let's see.
+
+
 def initialise_database_connection(host, port, username, password, dbname):
 	global _connection
 	try:
