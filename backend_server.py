@@ -10,9 +10,17 @@ app = Flask(__name__)
 
 @app.route('/', methods = ["GET"])
 def index():
-	return jsonify({
-		"argumentType": "dictionary"
+	# If no arguments, probably return all entries.
+	# But maybe at this same endpoint, if arguments are given,
+	# search for and return specific entries.
+	# That needs to be supported by the database module,
+	# for now we should just aim for it returning all entries.
+
+	response = jsonify({
+		"error": "Operation not supported yet!"
 	});
+	response.status_code = 501;
+	return response;
 
 @app.route('/', methods = ["POST"])
 def submit():
@@ -34,10 +42,31 @@ def submit():
 		response.status_code = 400;
 		return response;
 
+	# Note: We can break off the following code to a new function.
+
+	# Okay, everything went okay.
+	# Flask parses the JSON into a Python dictionary, so use it as such.
+	# Now. See if they provided all the fields we need.
+	expected_keys = ["title", "tags", "contents", "username"]
+	missing_keys = [key for key in expected_keys if key not in input_data]
+	if missing_keys:
+		response = jsonify({
+			"error": "Some fields are missing",
+			"missingFields": missing_keys
+		});
+		response.status_code = 400;
+		return response;
+
+	# Do double-check if they're empty.
+
+	# If not, then we have values for everything.
+	# Perhaps we should sanitise the values first? Somehow?
+	# Otherwise, send it off to the database module.
+
 	response = jsonify({
 		"error": "Operation not supported yet!"
 	});
-	response.status_code = 500;
+	response.status_code = 501;
 	return response;
 
 
