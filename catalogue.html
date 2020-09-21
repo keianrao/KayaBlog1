@@ -39,6 +39,17 @@
                 <br><br>
             </div>
 
+            <label for="tagFilter">Filter article list by tags</label></br>
+            <input id="tagFilter" type="search"></input>
+            <button id="tagFilterButton">Filter</button><br>
+            <label for="tagFilter">Tags are separated by vertical bar '|'</label>
+
+            <div id="separator" alt="Section separator">
+                <br><br>
+                //  \\  //  \\  //  \\  //  \\  //  \\  //  \\  //  \\  //  \\  //  \\  //  \\  //  \\  //  \\  //  \\  //  \\
+                <br><br>
+            </div>
+
             <a href="submit.html">Compose and submit new post</a>
 
         </div>
@@ -46,15 +57,8 @@
 
     <script src="backend-client.js"></script>
     <script>
-        var noJsDiv = document.getElementById("no-js"), yesJsDiv = document.getElementById("yes-js");
-        var articlesList = document.getElementById("articles-list");
-
-        noJsDiv.hidden = true;
-        yesJsDiv.hidden = false;
-        // The 'display' attribute in CSS can override these, so maybe we should use both? Ignore this comment if we're not using CSS.
-
         function renderArticle(article)
-        // Renders the given articleObject in the articles list.
+        // Renders the given articleObject onto the articles list.
         {
             var domArticleListItem = document.createElement("li");
             var domArticleAnchor = document.createElement("a");
@@ -66,6 +70,22 @@
             domArticleListItem.insertBefore(domArticleAnchor, null);
             articlesList.insertBefore(domArticleListItem, null);
         }
+
+        function filterByTags()
+        {
+            console.log(tagFilter.value);
+        }
+
+        var noJsDiv = document.getElementById("no-js"), yesJsDiv = document.getElementById("yes-js");
+        var articlesList = document.getElementById("articles-list");
+        var tagFilter = document.getElementById("tagFilter");
+        var tagFilterButton = document.getElementById("tagFilterButton");
+
+        noJsDiv.hidden = true;
+        yesJsDiv.hidden = false;
+        // The 'display' attribute in CSS can override these, so maybe we should use both? Ignore this comment if we're not using CSS.
+
+        tagFilterButton.onclick = filterByTags;
 
         renderArticle();
     </script>

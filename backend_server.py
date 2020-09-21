@@ -22,6 +22,26 @@ def index():
 	response.status_code = 501;
 	return response;
 
+
+@app.route('/read', methods = ["GET"])
+def read():
+    # Find blogpost ID in query parameters
+
+    # If none, bjork
+
+    # Otherwise, fetch from database
+
+    # Convert to JSON
+
+    # Send back
+
+	response = jsonify({
+		"error": "Operation not supported yet!"
+	});
+	response.status_code = 501;
+	return response;
+
+
 @app.route('/', methods = ["POST"])
 def submit():
 	if not request.is_json:
@@ -76,12 +96,12 @@ def submit():
 if __name__ == "__main__":
 	import backend_database_postgresql as db
 	if not db.initialise_database_connection_from_default_config_file():
-		print("{}{}{}{}".format(
-			"We tried to read database connection settings from ",
-			"the config file $HOME/.config/KayaBlog1/connection, ",
-			"but that didn't go well. Could you check the file? ",
+		print(
+			"We tried to read database connection settings from "
+			"the config file $HOME/.config/KayaBlog1/connection, "
+			"but that didn't go well. Could you check the file? "
 			"If it doesn't exist, please fill it out. Thanks!"
-		));
+		);
 		exit(1);
 
 	app.run();

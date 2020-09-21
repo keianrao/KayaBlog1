@@ -1,9 +1,7 @@
-#!/usr/bin/env python3
-
 import psycopg2
 import os
 import os.path
-from backend_models import Blogpost
+from backend_models import Blogpost, BlogpostListing
 
 # Reference for errors:
 # https://www.psycopg.org/docs/errors.html
@@ -23,6 +21,8 @@ _connection = None;
 ##	%%	##	%%	##	%%	##	%%	##
 
 def add_blog_post(blogpost):
+	raise NotImplementedError;
+
 	if type(blogpost) != Blogpost:
 		# Complain.
 		# It's okay for us to reject, we have no idea
@@ -33,13 +33,54 @@ def add_blog_post(blogpost):
 		# But for now let's just be typed. I don't know.
 		return;
 
+	# Similarly, check that all required fields in the blogpost are filled.
+
 	if _connection == None:
 		# Complain
-		return;
-		
-	# Okay, get a database cursor.
-	# Use psycopg techniques to create an insert statement.
-	# Execute then return;
+		return
+
+	with _connection.cursor() as cursor:
+		query = sql.SQL();
+
+
+def search_by_author(author):
+	raise NotImplementedError;
+
+	if _connection == None:
+		# Complain
+		return [];
+
+	with _connection.cursor() as cursor:
+		query = sql.SQL();
+
+
+def search_by_tags(tags):
+	raise NotImplementedError;
+
+	if _connection == None:
+		# Complain
+		return [];
+
+	with _connection.cursor() as cursor:
+		query = sql.SQL(
+			"""
+			SELECT {}
+			FROM {}
+			WHERE {} @> ARRAY[{}]
+			"""
+		).format(
+			sql.SQL(',').join(map(sql.Identifier, ['title', 'authorUsername', 'submissionDate', 'tags', 'contents'])),
+			sql.Identifier('blogposts'),
+			sql.Identifier('tags'),
+			sql.SQL(', ').join(sql.Placeholder() * len(tags))
+		);
+		cursor.execute(query, tags);
+		# Can a crafted value for tags break the array statement?
+
+		# Okay, let's create a list to hold the fetched values.
+		# Convert every table row in the results to a BlogpostListing
+		# (then inserting them into the list). Then return the list.
+		return map(BlogpostListing, cursor.fetchmany);
 
 
 def initialise_database_connection(host, port, username, password, dbname):
@@ -56,12 +97,6 @@ def initialise_database_connection(host, port, username, password, dbname):
 		print(op_err);
 		return
 	# We need to throw something..
-
-	# We have to get a Cursor now.
-	# Who should manage the Connection object, actually? Cursor object?
-	# Should we maintain the former but return instances of the latter?
-	# Or should we maintain all of them, and do all database operations
-	# on behalf of the other backend modules?
 
 
 def initialise_database_connection_from_config_file(filepath):
@@ -80,13 +115,13 @@ def initialise_database_connection_from_config_file(filepath):
 		# Docs don't say what happens near EOF.
 		# My experiments suggest that empty lines return '\n', but
 		# EOFs return '', the empty string. But that's the minimum.
-		# So the code above is safe. 
+		# So the code above is safe.
 		# (Although initialise_database_connection below should be
-		# ready to see empty strings instead of None)		
+		# ready to see empty strings instead of None)
 		initialise_database_connection(host, port, username, password, dbname);
-		
+
 	return True;
-	
+
 def initialise_database_connection_from_default_config_file():
 	"""
 	Reads data from the default config filepath, in $HOME/.config.
@@ -95,7 +130,7 @@ def initialise_database_connection_from_default_config_file():
 	# But if we find no .config folder, the user might be having a
 	# non-XDG installation, in which case it'd be good if we could
 	# give a prompt asking if it's okay for us to go ahead..
-	
+
 	try:
 		folderpath = os.environ['HOME'] + "/.config/KayaBlog1";
 		# Is it okay if we use Unix-style path separators like this?
@@ -103,21 +138,20 @@ def initialise_database_connection_from_default_config_file():
 		# Why is this function in os rather than os.path..?
 	except KeyError as key_err:
 		return False;
-	
+
 	filepath = folderpath + "/connection";
 	if not os.path.exists(filepath):
 		# There was no config file. We won't create one, so return..
 		# Later on we should print a message notifying the user.
 		# Plus a guide on how a config file looks, of course.
 		return False;
-	
+
 	return initialise_database_connection_from_config_file(filepath);
 	# I don't think our methods here are supposed to use return values,
 	# instead if any problems arise they should throw exceptions.
 	# Maybe we should follow that?
 
 def disconnect_database_connection():
-	if _connection == None:
-		return
+	if _connection == None: return
 	_connection.close()
-	
+

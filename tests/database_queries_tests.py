@@ -14,7 +14,7 @@
 # a test of *my* knowledge of how to use psycopg's interface.
 #
 # Note that I connect to the database. I'm not sure what happens
-# if we connect twice - later on our code should heave measures 
+# if we connect twice - later on our code should heave measures
 # for that.
 
 import backend_database_postgresql as db
@@ -33,7 +33,7 @@ def testSelect():
 		# But we want to go to town against test tables,
 		# so we'll bypass the interface and use the connection here.
 		# Perhaps we should have a get_connection() in the interface?
-		# Or is that a big security risk..		
+		# Or is that a big security risk..
 		query = sql.SQL(
 			"""
 			SELECT *
@@ -42,11 +42,11 @@ def testSelect():
 		).format(
 			sql.Identifier("ingredients")
 		);
-		
-		cursor.execute(query);		
+
+		cursor.execute(query);
 		for ingredient in cursor.fetchall():
 			print(ingredient);
-			
+
 
 def testInsert():
 	assert db._connection != None;
@@ -60,8 +60,8 @@ def testInsert():
 		).format(
 			sql.Identifier("ingredients")
 		);
-		cursor.execute(query, ("Ketam",));
-		
+		cursor.execute(query, ("Ketam"));
+
 		columns = ('id', 'name')
 		query = sql.SQL(
 			"""

@@ -4,40 +4,54 @@
     <meta charset="utf-8">
 
     <body>
-		<a href="/catalogue">Cancel and return to Catalogue</a>
-		<br><br>
-		<input id="title" type="text" placeholder="Title"></input>
-        <br>
-		<input id="tags" type="text" placeholder="Tags"></input>
-		<br>
+        <a href="/catalogue">Cancel and return to Catalogue</a>
+        <br><br>
+        <label for="contents">Blog post contents</label><br>
         <textarea id="contents" cols=80 rows=24></textarea>
-		<br><br>
-        <input id="username" type="text" placeholder="Username"></input>
-        <input id="password" type="password" placeholder="Password"></input>
+        <br><br>
+        <label for="title">Blog post title</label><br>
+        <input id="title" type="text"></input>
+        <br>
+        <label for="tags">Tags</label><br>
+        <input id="tags" type="text"></input>
+        <label for="tags">Tags are separated by vertical bar '|'</label>
+        <br><br>
+        <!-- Please replace these with separator divs or margins. -->
+        <label for="username">Username</label><br>
+        <input id="username" type="text"></input>
+        <br>
+        <label for="password">Password</label><br>
+        <input id="password" type="password"></input>
+        <br>
         <button id="submit" disabled=true>Submit</button>
         <span id="statusbar"></span>
     </body>
 
     <script src="database-client.js"></script>
     <script>
-		var title = document.getElementById("title");
-		var tags = document.getElementById("tags");
+        var title = document.getElementById("title");
+        var tags = document.getElementById("tags");
         var username = document.getElementById("username");
         var password = document.getElementById("password");
         var submit = document.getElementById("submit");
         var statusbar = document.getElementById("statusbar");
-		/*
-		* Why are we grabbing individual fields like this?
-		* If it's all one form, shouldn't we make a <form>?
-		*/
+        /*
+        * Why are we grabbing individual fields like this?
+        * If it's all one form, shouldn't we make a <form>?
+        */
 
-        connectToDatabase()
-            .then(function (result) {
-                submit.disabled = false;
-            })
-            .catch(function (failureReason) {
-                statusbar.innerHTML = failureReason;
-            });
+        if (typeof connectToDatabase === "undefined") {
+            statusbar.innerText = "Could not find code to connect to the blog post database.."
+        }
+        else {
+            connectToDatabase()
+                .then(function (result) {
+                    submit.disabled = false;
+                })
+                .catch(function (failureReason) {
+                    statusbar.innerText = failureReason;
+                });
+        }
     </script>
 
 </html>
