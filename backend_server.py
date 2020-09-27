@@ -4,9 +4,11 @@ from flask import Flask, request, jsonify
 from werkzeug.exceptions import BadRequest
 app = Flask(__name__)
 
+from backend_errors import ContentTypeNotJsonException, NotWellFormedJsonException
+
+
 
 ##	%%	##	%%	##	%%	##	%%	##
-
 
 @app.route('/', methods = ["GET"])
 def index():
@@ -15,83 +17,100 @@ def index():
 	# search for and return specific entries.
 	# That needs to be supported by the database module,
 	# for now we should just aim for it returning all entries.
+	
+	#input_data = get_json();
+	
+	raise NotImplementedError;
 
-	response = jsonify({
-		"error": "Operation not supported yet!"
-	});
-	response.status_code = 501;
-	return response;
 
 
 @app.route('/read', methods = ["GET"])
 def read():
-    # Find blogpost ID in query parameters
+	#input_data = _get_json();
+	
+	# Find blogpost ID in query parameters
 
-    # If none, bjork
+	# If none, bjork
 
-    # Otherwise, fetch from database
+	# Otherwise, fetch from database
 
-    # Convert to JSON
+	# Convert to JSON
 
-    # Send back
+	# Send back
 
-	response = jsonify({
-		"error": "Operation not supported yet!"
-	});
-	response.status_code = 501;
-	return response;
+	raise NotImplementedError;
+
 
 
 @app.route('/', methods = ["POST"])
 def submit():
-	if not request.is_json:
-		response = jsonify({
-			"error": "Input data must be in the form of JSON!" \
-				" Check that the request mimetype is 'application/json'."
-		});
-		response.status_code = 400;
-		return response;
+	input_data = _get_json();
 
-	try:
-		input_data = request.get_json();
-	except BadRequest:
-		response = jsonify({
-			"error": "Input data must be in the form of JSON!" \
-				" Check that the data in the request is well-formed JSON."
-		});
-		response.status_code = 400;
-		return response;
-
-	# Note: We can break off the following code to a new function.
-
-	# Okay, everything went okay.
 	# Flask parses the JSON into a Python dictionary, so use it as such.
 	# Now. See if they provided all the fields we need.
-	expected_keys = ["title", "tags", "contents", "username"]
-	missing_keys = [key for key in expected_keys if key not in input_data]
+	expected_keys = ["title", "tags", "contents", "username"];
+	missing_keys = [key for key in expected_keys if key not in input_data];
 	if missing_keys:
 		response = jsonify({
-			"error": "Some fields are missing",
+			"errorMessage": "Some fields are missing",
 			"missingFields": missing_keys
 		});
 		response.status_code = 400;
 		return response;
 
-	# Do double-check if they're empty.
+	# Okay, then double-check all the fields, see if they're valid.
+	# Maybe sanitise them?
+	# Otherwise, send it to the database module.
 
-	# If not, then we have values for everything.
-	# Perhaps we should sanitise the values first? Somehow?
-	# Otherwise, send it off to the database module.
-
+	raise NotImplementedError;
+	
+	
+	
+@app.errorhandler(NotImplementedError)
+def response_for_not_implemented_error(e):
 	response = jsonify({
-		"error": "Operation not supported yet!"
+		"errorMessage": "Operation not supported yet!"
 	});
-	response.status_code = 501;
+	response.code = 501;
+	return response;
+	
+	
+	
+@app.errorhandler(ContentTypeNotJsonException)
+def response_for_content_type_not_json_exception(e):
+	response = jsonify({
+		"errorMessage": \
+			"Request mimetype is not 'application/json'!" \
+	        " This API endpoint only supports JSON requests."
+	});
+	response.code = 400;
+	return response;
+	
+	
+	
+@app.errorhandler(NotWellFormedJsonException)
+def response_for_not_well_formed_json_exception(e):
+	response = jsonify({
+		"errorMessage": "Request data is not well-formed JSON!"
+	});
+	response.code = 400;
 	return response;
 
 
-##	%%	##	%%	##	%%	##	%%	##
 
+##	%%	##	%%	##	%%	##	%%	##
+	
+def _get_json():
+	if not request.is_json:
+		raise ContentTypeNotJsonException;
+	try:
+		return request.get_json();
+	except BadRequest:
+		raise NotWellFormedJsonException;
+		
+		
+		
+##	%%	##	%%	##	%%	##	%%	##
 
 if __name__ == "__main__":
 	import backend_database_postgresql as db
@@ -105,4 +124,5 @@ if __name__ == "__main__":
 		exit(1);
 
 	app.run();
+	# app.run() has to be called down here, after all else has been declared.
 	db.disconnect_database_connection();

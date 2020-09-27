@@ -43,6 +43,7 @@ def add_blog_post(blogpost):
 		query = sql.SQL();
 
 
+
 def search_by_author(author):
 	raise NotImplementedError;
 
@@ -52,6 +53,7 @@ def search_by_author(author):
 
 	with _connection.cursor() as cursor:
 		query = sql.SQL();
+
 
 
 def search_by_tags(tags):
@@ -81,6 +83,7 @@ def search_by_tags(tags):
 		# Convert every table row in the results to a BlogpostListing
 		# (then inserting them into the list). Then return the list.
 		return map(BlogpostListing, cursor.fetchmany);
+
 
 
 def initialise_database_connection(host, port, username, password, dbname):

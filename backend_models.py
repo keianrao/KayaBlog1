@@ -1,13 +1,27 @@
 
 from collections import namedtuple
 
-Blogpost = namedtuple('Blogpost', ['title', 'authorUsername', 'submissionDate', 'tags', 'contents'])
+Blogpost = namedtuple(
+	'Blogpost', 
+	['title', 'authorUsername', 'submissionDate', 'tags', 'contents']
+)
 
-BlogpostListing = namedtuple('BlogpostListing', ['id', 'title', 'authorUsername', 'submissionDate', 'tags'])
+BlogpostListing = namedtuple(
+	'BlogpostListing', 
+	['id', 'title', 'authorUsername', 'submissionDate', 'tags']
+)
 
-BlogpostAuthorSearch = namedtuple('BlogpostAuthorSearch', ['author'])
+BlogpostAuthorSearch = namedtuple(
+	'BlogpostAuthorSearch',
+	['author']
+)
 
-BlogpostTagSearch = namedtuple('BlogpostTagSearch', ['tags'])
+BlogpostTagSearch = namedtuple(
+	'BlogpostTagSearch', 
+	['tags']
+)
 
-BlogpostSubmission = namedtuple('BlogpostSubmission', ['blogpost', 'username', 'password'])
-
+BlogpostSubmission = namedtuple(
+	'BlogpostSubmission',
+	['blogpost', 'username', 'password']
+)
