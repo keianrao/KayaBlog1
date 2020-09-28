@@ -4,7 +4,8 @@ from flask import Flask, request, jsonify
 from werkzeug.exceptions import BadRequest
 app = Flask(__name__)
 
-from backend_errors import ContentTypeNotJsonException, NotWellFormedJsonException
+from backend_errors import \
+	ContentTypeNotJsonException, NotWellFormedJsonException
 
 
 
@@ -26,19 +27,35 @@ def index():
 
 @app.route('/read', methods = ["GET"])
 def read():
-	#input_data = _get_json();
+	input_data = _get_json();
 	
-	# Find blogpost ID in query parameters
-
-	# If none, bjork
-
+	if "blogpostID" not in input_data:
+		return _create_http_jsonify_response(400, {
+			"errorMessage": "A blogpost ID is needed.",
+			"missingFields": "blogpostID"
+		});
+	
 	# Otherwise, fetch from database
-
-	# Convert to JSON
-
-	# Send back
-
-	raise NotImplementedError;
+	blogpost_id = input_data["blogpostID"];
+	try:
+		blogpost = db.get_blogpost_by_id(blogpost_id);
+		return _create_http_jsonify_response(200, {
+			"title": blogpost.title,
+			"authorUsername": blogpost.authorUsername,
+			"submissionDate": blogpost.submissionDate,
+			"tags": blogpost.tags,
+			"contents": blogpost.contents
+		});
+	except KeyError:
+		return _create_http_jsonify_response(400, {
+			"errorMessage": "No blogpost was found with that ID.",
+			"id": blogpost_id
+		});
+	except TypeError:
+		return _create_http_jsonify_response(400, {
+			"errorMessage": "The blogpost ID was of an invalid format.",
+			"id": blogpost_id
+		});
 
 
 
@@ -51,12 +68,10 @@ def submit():
 	expected_keys = ["title", "tags", "contents", "username"];
 	missing_keys = [key for key in expected_keys if key not in input_data];
 	if missing_keys:
-		response = jsonify({
+		return _create_http_jsonify_response(400, {
 			"errorMessage": "Some fields are missing",
 			"missingFields": missing_keys
 		});
-		response.status_code = 400;
-		return response;
 
 	# Okay, then double-check all the fields, see if they're valid.
 	# Maybe sanitise them?
@@ -65,36 +80,27 @@ def submit():
 	raise NotImplementedError;
 	
 	
-	
 @app.errorhandler(NotImplementedError)
 def response_for_not_implemented_error(e):
-	response = jsonify({
+	return _create_http_jsonify_response(501, {
 		"errorMessage": "Operation not supported yet!"
 	});
-	response.code = 501;
-	return response;
-	
 	
 	
 @app.errorhandler(ContentTypeNotJsonException)
 def response_for_content_type_not_json_exception(e):
-	response = jsonify({
+	return _create_http_jsonify_response(400, {
 		"errorMessage": \
 			"Request mimetype is not 'application/json'!" \
 	        " This API endpoint only supports JSON requests."
 	});
-	response.code = 400;
-	return response;
-	
 	
 	
 @app.errorhandler(NotWellFormedJsonException)
 def response_for_not_well_formed_json_exception(e):
-	response = jsonify({
+	return _create_http_jsonify_response(400, {
 		"errorMessage": "Request data is not well-formed JSON!"
 	});
-	response.code = 400;
-	return response;
 
 
 
@@ -107,6 +113,13 @@ def _get_json():
 		return request.get_json();
 	except BadRequest:
 		raise NotWellFormedJsonException;
+		
+		
+		
+def _create_http_jsonify_response(http_code, dictionary):
+	response = jsonify(dictionary);
+	response.code = http_code;
+	return response;
 		
 		
 		

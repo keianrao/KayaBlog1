@@ -1,4 +1,5 @@
 import psycopg2
+from psycopg2 import sql
 import os
 import os.path
 from backend_models import Blogpost, BlogpostListing
@@ -20,7 +21,7 @@ _connection = None;
 
 ##	%%	##	%%	##	%%	##	%%	##
 
-def add_blog_post(blogpost):
+def add_blogpost(blogpost):
 	raise NotImplementedError;
 
 	if type(blogpost) != Blogpost:
@@ -43,6 +44,42 @@ def add_blog_post(blogpost):
 		query = sql.SQL();
 
 
+def get_blogpost_by_id(blogpost_id):
+	try:
+		blogpost_id = int(blogpost_id);
+	except ValueError:
+		raise TypeError;
+	# Apart from being correct (column type in DB really is integer*),
+	# this lets us not worry about sanitisation. I've never heard of
+	# an injection attack through a bunch of digital numbers.
+	# https://stackoverflow.com/questions/48933793/
+	# is-casting-user-input-to-an-integer-sufficient-to-sanitize-it
+	# Because, integers aren't parsed as code, and rarely do we have
+	# special-case ones that you can 'press' to create an effect.
+	#
+	# * Probably safe to mention this in the backend source code..?
+	
+	# Okay, let's have fun.
+	with _connection.cursor() as cursor:
+		query = sql.SQL(
+			"""
+			SELECT title, authorUsername, submissionDate, tags, contents
+			FROM Blogposts
+			WHERE id = {}
+			"""
+		).format(
+			sql.Placeholder()
+		);
+		cursor.execute(query, [blogpost_id]);
+		
+		result = cursor.fetchone();
+		if result == None: 
+			raise KeyError;
+		else:
+			return Blogpost(*result);
+			# What psycopg2 gives should be a tuple, if so then
+			# we should be able to use the unpack operator like this.
+		
 
 def search_by_author(author):
 	raise NotImplementedError;
