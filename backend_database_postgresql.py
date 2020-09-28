@@ -3,6 +3,7 @@ from psycopg2 import sql
 import os
 import os.path
 from backend_models import Blogpost, BlogpostListing
+from backend_errors import WrongArgumentTypeException, EntityNotFoundException
 
 # Reference for errors:
 # https://www.psycopg.org/docs/errors.html
@@ -48,7 +49,7 @@ def get_blogpost_by_id(blogpost_id):
 	try:
 		blogpost_id = int(blogpost_id);
 	except ValueError:
-		raise TypeError;
+		raise WrongArgumentTypeException;
 	# Apart from being correct (column type in DB really is integer*),
 	# this lets us not worry about sanitisation. I've never heard of
 	# an injection attack through a bunch of digital numbers.
@@ -74,7 +75,7 @@ def get_blogpost_by_id(blogpost_id):
 		
 		result = cursor.fetchone();
 		if result == None: 
-			raise KeyError;
+			raise EntityNotFoundException;
 		else:
 			return Blogpost(*result);
 			# What psycopg2 gives should be a tuple, if so then

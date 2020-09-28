@@ -5,7 +5,8 @@ from werkzeug.exceptions import BadRequest
 app = Flask(__name__)
 
 from backend_errors import \
-	ContentTypeNotJsonException, NotWellFormedJsonException
+	ContentTypeNotJsonException, NotWellFormedJsonException, \
+	WrongArgumentTypeException, EntityNotFoundException
 
 
 
@@ -46,12 +47,12 @@ def read():
 			"tags": blogpost.tags,
 			"contents": blogpost.contents
 		});
-	except KeyError:
+	except EntityNotFoundException:
 		return _create_http_jsonify_response(400, {
 			"errorMessage": "No blogpost was found with that ID.",
 			"id": blogpost_id
 		});
-	except TypeError:
+	except WrongArgumentTypeException:
 		return _create_http_jsonify_response(400, {
 			"errorMessage": "The blogpost ID was of an invalid format.",
 			"id": blogpost_id
