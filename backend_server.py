@@ -22,9 +22,16 @@ def index():
 	
 	#input_data = get_json();
 	
-	raise NotImplementedError;
-
-
+	blogpost_listings = list(db.get_blogpost_listings());
+	return _create_http_jsonify_response(200, blogpost_listings);
+	# This returns each blogpost listing as an array, with no key names.
+	# I've read and, apparently, namedtuples are inherently more like tuples,
+	# with use of names being a convenience rather than baked into the object.
+	# It seems like it'd be wise for us to switch our models to dictionaries
+	# instead - or map over get_blogpost_listings() above to convert all
+	# into a dictionary. (But, if we store data in the database rather than
+	# in our memory, why bother using namedtuples to be more "efficient"
+	# than dictionaries?)
 
 @app.route('/read', methods = ["GET"])
 def read():
@@ -106,7 +113,7 @@ def response_for_not_well_formed_json_exception(e):
 
 
 ##	%%	##	%%	##	%%	##	%%	##
-	
+
 def _get_json():
 	if not request.is_json:
 		raise ContentTypeNotJsonException;

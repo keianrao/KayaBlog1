@@ -45,43 +45,22 @@ def add_blogpost(blogpost):
 		query = sql.SQL();
 
 
-def get_blogpost_by_id(blogpost_id):
-	try:
-		blogpost_id = int(blogpost_id);
-	except ValueError:
-		raise WrongArgumentTypeException;
-	# Apart from being correct (column type in DB really is integer*),
-	# this lets us not worry about sanitisation. I've never heard of
-	# an injection attack through a bunch of digital numbers.
-	# https://stackoverflow.com/questions/48933793/
-	# is-casting-user-input-to-an-integer-sufficient-to-sanitize-it
-	# Because, integers aren't parsed as code, and rarely do we have
-	# special-case ones that you can 'press' to create an effect.
-	#
-	# * Probably safe to mention this in the backend source code..?
-	
-	# Okay, let's have fun.
-	with _connection.cursor() as cursor:
-		query = sql.SQL(
-			"""
-			SELECT title, authorUsername, submissionDate, tags, contents
-			FROM Blogposts
-			WHERE id = {}
-			"""
-		).format(
-			sql.Placeholder()
-		);
-		cursor.execute(query, [blogpost_id]);
-		
-		result = cursor.fetchone();
-		if result == None: 
-			raise EntityNotFoundException;
-		else:
-			return Blogpost(*result);
-			# What psycopg2 gives should be a tuple, if so then
-			# we should be able to use the unpack operator like this.
-		
 
+def get_blogpost_listings():
+	with _connection.cursor() as cursor:
+		cursor.execute(
+			sql.SQL(
+				"""
+				SELECT id, title, author, submissionDate, tags
+				FROM Blogposts
+				"""
+			)
+		);		
+		return map(lambda result: BlogpostListing(*result), cursor.fetchall());
+		# Let's say that
+		# the DB functions with multiple results return Iterables.
+		
+		
 def search_by_author(author):
 	raise NotImplementedError;
 
@@ -91,7 +70,6 @@ def search_by_author(author):
 
 	with _connection.cursor() as cursor:
 		query = sql.SQL();
-
 
 
 def search_by_tags(tags):
@@ -121,6 +99,44 @@ def search_by_tags(tags):
 		# Convert every table row in the results to a BlogpostListing
 		# (then inserting them into the list). Then return the list.
 		return map(BlogpostListing, cursor.fetchmany);
+
+
+
+def get_blogpost_by_id(blogpost_id):
+	try:
+		blogpost_id = int(blogpost_id);
+	except ValueError:
+		raise WrongArgumentTypeException;
+	# Apart from being correct (column type in DB really is integer*),
+	# this lets us not worry about sanitisation. I've never heard of
+	# an injection attack through a bunch of digital numbers.
+	# https://stackoverflow.com/questions/48933793/
+	# is-casting-user-input-to-an-integer-sufficient-to-sanitize-it
+	# Because, integers aren't parsed as code, and rarely do we have
+	# special-case ones that you can 'press' to create an effect.
+	#
+	# * Probably safe to mention this in the backend source code..?
+	
+	# Okay, let's have fun.
+	with _connection.cursor() as cursor:
+		query = sql.SQL(
+			"""
+			SELECT title, author, submissionDate, tags, contents
+			FROM Blogposts
+			WHERE id = {}
+			"""
+		).format(
+			sql.Placeholder()
+		);
+		cursor.execute(query, [blogpost_id]);
+		
+		result = cursor.fetchone();
+		if result == None: 
+			raise EntityNotFoundException;
+		else:
+			return Blogpost(*result);
+			# What psycopg2 gives should be a tuple, if so then
+			# we should be able to use the unpack operator like this.
 
 
 
